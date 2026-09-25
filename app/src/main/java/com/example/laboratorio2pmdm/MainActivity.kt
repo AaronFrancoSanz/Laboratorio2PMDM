@@ -2,9 +2,12 @@ package com.example.laboratorio2pmdm
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.Spinner
 import android.widget.Toast
@@ -33,13 +36,20 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        // 1. Nombre: EditText con foco automático
+        // 1. Nombre
         val nombreEditText = findViewById<EditText>(R.id.editTextText2)
         nombreEditText.requestFocus()
 
+        // Registrar nombre cuando se escribe
+        nombreEditText.setOnFocusChangeListener { _, tieneFoco ->
+            if (!tieneFoco) {
+                Log.d("NOMBRE", "Nombre: ${nombreEditText.text}")
+            }
+        }
+
+        // 2. Raza - Spinner
         val spinner = findViewById<Spinner>(R.id.spinner)
 
-// 2. Raza: Spinner
         val razas = resources.getStringArray(R.array.razas)
 
         val adapter = ArrayAdapter(
@@ -54,9 +64,59 @@ class MainActivity : AppCompatActivity() {
 
         spinner.adapter = adapter
 
-        // Lambda para registrar la estructura elegida en Logcat
-        val registrarGuerrero: (String) -> Unit = { guerrero ->
-            Log.d("GUERRERO", guerrero)
+        // Log individual del Spinner
+        spinner.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: android.view.View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    Log.d("RAZA", "Raza seleccionada: ${razas[position]}")
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                    Log.d("RAZA", "No se ha seleccionado ninguna raza")
+                }
+            }
+
+        // 3. Facción
+        val radioGroup = findViewById<RadioGroup>(R.id.radioGroup)
+        val radioComunidad = findViewById<RadioButton>(R.id.radioButton)
+        val radioMordor = findViewById<RadioButton>(R.id.radioButton2)
+
+        // Comunidad del Anillo
+        radioComunidad.setOnClickListener {
+            Log.d("FACCION", "Facción seleccionada: Comunidad del Anillo")
+        }
+
+        // Huestes de Mordor
+        radioMordor.setOnClickListener {
+            Log.d("FACCION", "Facción seleccionada: Huestes de Mordor")
+        }
+
+        // 4. Habilidades
+        val checkBoxSigilo = findViewById<CheckBox>(R.id.checkBox2)
+        val checkBoxCombate = findViewById<CheckBox>(R.id.checkBox)
+
+        // Sigilo
+        checkBoxSigilo.setOnCheckedChangeListener { _, seleccionado ->
+            if (seleccionado) {
+                Log.d("HABILIDAD", "Habilidad seleccionada: Sigilo")
+            } else {
+                Log.d("HABILIDAD", "Habilidad deseleccionada: Sigilo")
+            }
+        }
+
+        // Combate con Espada
+        checkBoxCombate.setOnCheckedChangeListener { _, seleccionado ->
+            if (seleccionado) {
+                Log.d("HABILIDAD", "Habilidad seleccionada: Combate con Espada")
+            } else {
+                Log.d("HABILIDAD", "Habilidad deseleccionada: Combate con Espada")
+            }
         }
 
         // 5. Botón de registro
@@ -64,14 +124,8 @@ class MainActivity : AppCompatActivity() {
 
         botonRegistro.setOnClickListener {
 
-            // Nombre
             val nombre = nombreEditText.text.toString()
-
-            // Raza
             val raza = spinner.selectedItem.toString()
-
-            // 3. Facción
-            val radioGroup = findViewById<RadioGroup>(R.id.radioGroup)
 
             val faccion = when (radioGroup.checkedRadioButtonId) {
                 R.id.radioButton -> "Comunidad del Anillo"
@@ -79,22 +133,13 @@ class MainActivity : AppCompatActivity() {
                 else -> "Sin facción"
             }
 
-            // 4. Habilidades especiales
-            val sigilo = findViewById<android.widget.CheckBox>(
-                R.id.checkBox2
-            ).isChecked
-
-            val combate = findViewById<android.widget.CheckBox>(
-                R.id.checkBox
-            ).isChecked
-
             val habilidades = mutableListOf<String>()
 
-            if (sigilo) {
+            if (checkBoxSigilo.isChecked) {
                 habilidades.add("Sigilo")
             }
 
-            if (combate) {
+            if (checkBoxCombate.isChecked) {
                 habilidades.add("Combate con Espada")
             }
 
@@ -102,7 +147,6 @@ class MainActivity : AppCompatActivity() {
                 habilidades.add("Ninguna")
             }
 
-            // Estructura final del personaje
             val personaje = """
                 Nombre: $nombre
                 Raza: $raza
@@ -110,15 +154,13 @@ class MainActivity : AppCompatActivity() {
                 Habilidades: ${habilidades.joinToString(", ")}
             """.trimIndent()
 
-            // Toast con el resumen
             Toast.makeText(
                 this,
                 personaje,
                 Toast.LENGTH_LONG
             ).show()
 
-            // Registrar mediante lambda en Logcat
-            registrarGuerrero(personaje)
+            Log.d("REGISTRO", personaje)
         }
     }
 }
