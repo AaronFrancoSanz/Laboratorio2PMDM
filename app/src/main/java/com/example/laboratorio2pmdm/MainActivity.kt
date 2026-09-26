@@ -122,6 +122,10 @@ class MainActivity : AppCompatActivity() {
         // 5. Botón de registro
         val botonRegistro = findViewById<ImageButton>(R.id.imageButton2)
 
+        val registrarEnLogcat: (String) -> Unit = { personaje ->
+            Log.d("REGISTRO", personaje)
+        }
+
         botonRegistro.setOnClickListener {
 
             val nombre = nombreEditText.text.toString()
@@ -160,7 +164,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.LENGTH_LONG
             ).show()
 
-            Log.d("REGISTRO", personaje)
+            registrarEnLogcat(personaje)
         }
     }
 }
