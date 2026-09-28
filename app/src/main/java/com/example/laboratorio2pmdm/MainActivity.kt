@@ -17,7 +17,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
 class MainActivity : AppCompatActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -36,32 +35,36 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        // 1. Nombre
+        //Buscamos el campo de texto donde el usuario introduce el nombre
         val nombreEditText = findViewById<EditText>(R.id.editTextText2)
         nombreEditText.requestFocus()
 
-        // Registrar nombre cuando se escribe
+        //Colocamos automáticamente el cursor en el campo del nombre
         nombreEditText.setOnFocusChangeListener { _, tieneFoco ->
             if (!tieneFoco) {
                 Log.d("NOMBRE", "Nombre: ${nombreEditText.text}")
             }
         }
 
-        // 2. Raza - Spinner
+        //Obtenemos el Spinner donde el usuario podrá elegir una raza
         val spinner = findViewById<Spinner>(R.id.spinner)
 
+        //Obtenemos del archivo strings.xml la lista de razas disponibles
         val razas = resources.getStringArray(R.array.razas)
 
+        //Creamos un adaptador para mostrar las razas dentro del Spinner
         val adapter = ArrayAdapter(
             this,
             android.R.layout.simple_spinner_item,
             razas
         )
 
+        //Indicamos el diseño que tendrá la lista desplegable de razas
         adapter.setDropDownViewResource(
             android.R.layout.simple_spinner_dropdown_item
         )
 
+        //Asociamos el adaptaor al Spinner
         spinner.adapter = adapter
 
         // Log individual del Spinner
@@ -82,26 +85,26 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-        // 3. Facción
+        //Obtenemos el grupo de botones y los dos botones de selección
         val radioGroup = findViewById<RadioGroup>(R.id.radioGroup)
         val radioComunidad = findViewById<RadioButton>(R.id.radioButton)
         val radioMordor = findViewById<RadioButton>(R.id.radioButton2)
 
-        // Comunidad del Anillo
+        //Comunidad del Anillo
         radioComunidad.setOnClickListener {
             Log.d("FACCION", "Facción seleccionada: Comunidad del Anillo")
         }
 
-        // Huestes de Mordor
+        //Huestes de Mordor
         radioMordor.setOnClickListener {
             Log.d("FACCION", "Facción seleccionada: Huestes de Mordor")
         }
 
-        // 4. Habilidades
+        //Obtenemos los CheckBox correspondientes a las habilidades disponibles
         val checkBoxSigilo = findViewById<CheckBox>(R.id.checkBox2)
         val checkBoxCombate = findViewById<CheckBox>(R.id.checkBox)
 
-        // Sigilo
+        //Sigilo
         checkBoxSigilo.setOnCheckedChangeListener { _, seleccionado ->
             if (seleccionado) {
                 Log.d("HABILIDAD", "Habilidad seleccionada: Sigilo")
@@ -110,7 +113,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Combate con Espada
+        //Combate con Espada
         checkBoxCombate.setOnCheckedChangeListener { _, seleccionado ->
             if (seleccionado) {
                 Log.d("HABILIDAD", "Habilidad seleccionada: Combate con Espada")
@@ -119,24 +122,28 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // 5. Botón de registro
+        //Obtenemos el botón que utilizará el usuario para registrar el personaje
         val botonRegistro = findViewById<ImageButton>(R.id.imageButton2)
 
+        //Creamos una función que recibe los datos del personaje y los muestra en Logcat
         val registrarEnLogcat: (String) -> Unit = { personaje ->
             Log.d("REGISTRO", personaje)
         }
 
+        //Cuando el usuario pulsa el botón de registro recogemos todos los datos introducidos en el formulario
         botonRegistro.setOnClickListener {
 
             val nombre = nombreEditText.text.toString()
             val raza = spinner.selectedItem.toString()
 
+            //Comprobamos qué botón de facción está seleccionado
             val faccion = when (radioGroup.checkedRadioButtonId) {
                 R.id.radioButton -> "Comunidad del Anillo"
                 R.id.radioButton2 -> "Huestes de Mordor"
                 else -> "Sin facción"
             }
 
+            //Creamos una lista donde guardaremos las habilidades seleccionadas
             val habilidades = mutableListOf<String>()
 
             if (checkBoxSigilo.isChecked) {
@@ -151,6 +158,7 @@ class MainActivity : AppCompatActivity() {
                 habilidades.add("Ninguna")
             }
 
+            //Creamos un texto con todos los datos del personaje
             val personaje = """
                 Nombre: $nombre
                 Raza: $raza
@@ -158,12 +166,14 @@ class MainActivity : AppCompatActivity() {
                 Habilidades: ${habilidades.joinToString(", ")}
             """.trimIndent()
 
+            //Mostramos los datos del personaje un mensaje emergente
             Toast.makeText(
                 this,
                 personaje,
                 Toast.LENGTH_LONG
             ).show()
 
+            //Enviamos los datos del personaje a Logcat
             registrarEnLogcat(personaje)
         }
     }
